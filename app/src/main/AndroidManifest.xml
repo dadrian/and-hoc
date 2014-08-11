@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.davidadrian.andhoc" >
 
-    <uses-sdk android:minSdkVersion="16" />
-
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
@@ -26,16 +24,11 @@
         </activity>
 
         <service
-            android:name=".P2pService"
+            android:name=".service.AndHocService"
             android:enabled="true"
             android:exported="false" >
         </service>
 
-        <receiver
-            android:name=".WiFiDirectBroadcastReceiver"
-            android:enabled="true"
-            android:exported="true" >
-        </receiver>
     </application>
 
 </manifest>
