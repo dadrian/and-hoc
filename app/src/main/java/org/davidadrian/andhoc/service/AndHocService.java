@@ -52,6 +52,8 @@ public class AndHocService extends Service {
     public class SingleUserMessenger implements AndHocMessenger {
 
         private String mUser;
+        private AndHocMessage mMessage;
+        private boolean mBroadcasting = false;
 
         protected SingleUserMessenger(String username) {
             mUser = username;
@@ -63,8 +65,27 @@ public class AndHocService extends Service {
         }
 
         @Override
-        public void send(AndHocMessage message) {
-            AndHocService.this.setBroadcast(message);
+        public void setMessage(AndHocMessage message) {
+            mMessage = message;
+            if (mBroadcasting) {
+                broadcast();
+            }
+        }
+
+        @Override
+        public void broadcast() {
+            if (mMessage == null) {
+                Log.d(TAG, "Not broadcasting (message is null)");
+                return;
+            }
+            AndHocService.this.setBroadcast(mMessage);
+            mBroadcasting = true;
+        }
+
+        @Override
+        public void stopBroadcast() {
+            mBroadcasting = false;
+            AndHocService.this.removeBroadcast();
         }
     }
 
@@ -198,6 +219,24 @@ public class AndHocService extends Service {
         });
     }
 
+    private void removeBroadcast() {
+        if (mServiceInfo == null) {
+            return;
+        }
+        mManager.removeLocalService(mChannel, mServiceInfo, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Log.d(TAG, "removeBroadcast callback success!");
+                mServiceInfo = null;
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Log.e(TAG, "Could not remove broadcast");
+            }
+        });
+    }
+
     private void setBroadcast(AndHocMessage msg) {
         final Map<String, String> record = new HashMap();
         record.put("name", msg.getName());
@@ -208,6 +247,7 @@ public class AndHocService extends Service {
                 @Override
                 public void onSuccess() {
                     Log.d(TAG, "Removed old broadcast");
+                    mServiceInfo = null;
                     finishSetBroadcast(record);
                 }
 

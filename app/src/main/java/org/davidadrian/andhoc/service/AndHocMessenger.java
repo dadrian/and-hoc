@@ -7,6 +7,10 @@ public interface AndHocMessenger {
 
     public AndHocMessage createMessage(String messageText);
 
-    public void send(AndHocMessage message);
+    public void setMessage(AndHocMessage message);
+
+    public void broadcast();
+
+    public void stopBroadcast();
 
 }
